@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<audio id="wave1File">
+    <source src="/Users/greg/Desktop/IOT/wave1.wav" type="audio/wav">
+</audio>
+<audio id="wave2File">
+    <source src="/Users/greg/Desktop/IOT/wave2.wav" type="audio/wav">
+</audio>
+<script type="text/javascript" src="./recordAudio.js"> </script>
+
+<h1>Active Noise Cancelling Sync</h1>
+<p>Each device needs to connect to this site and claim their position</p>
+<button class="scriptbutton" onclick="exec('python ./createWaves.py');">Create Audio</button><br>
+<br>
+<button class="button" onclick="playWave1()">Orignal Audio</button>
+<button class="button" onclick="playWave2()">Interferance Audio</button><br>
+<br>
+<button class="recordbutton" onclick="startRecording()">Listener</button>
+<button class="recordbutton" onclick="stopRecording()">Stop Listener</button><br>
+<br>
+
+
+</body>
+</html>
+
+<style>
+    .button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 15px 25px;
+        text-align: center;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .button2 {
+        background-color: rgb(52, 147, 255);
+        border: none;
+        color: white;
+        padding: 15px 25px;
+        text-align: center;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .scriptbutton {
+        background-color: rgb(147, 76, 175);
+        border: none;
+        color: white;
+        padding: 15px 25px;
+        text-align: center;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .recordbutton {
+        background-color: rgb(235, 65, 65);
+        border: none;
+        color: white;
+        padding: 15px 25px;
+        text-align: center;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    
+    .button:hover {
+        background-color: green;
+    }
+    .button2:hover {
+        background-color: blue;
+    }
+</style>
+
+<script>
+    var wave1Play = document.getElementById("wave1File"); 
+    var wave2Play = document.getElementById("wave2File");
+
+    function playWave1() { 
+    wave1Play.play(); 
+    } 
+    function playWave2() { 
+    wave2Play.play(); 
+    } 
+
+    var onFail = function(e) {
+		console.log('Rejected!', e);
+    };
+
+    var onSuccess = function(s) {
+    	var context = new webkitAudioContext();
+    	var mediaStreamSource = context.createMediaStreamSource(s);
+    	recorder = new Recorder(mediaStreamSource);
+    	recorder.record();
+
+    	// audio loopback
+    	// mediaStreamSource.connect(context.destination);
+    }
+
+    window.URL = window.URL || window.webkitURL;
+    navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+    var recorder;
+    var audio = document.querySelector('audio');
+
+    function startRecording() {
+    	if (navigator.getUserMedia) {
+    		navigator.getUserMedia({audio: true}, onSuccess, onFail);
+    	} else {
+    		console.log('navigator.getUserMedia not present');
+    	}
+    }
+
+    function stopRecording() {
+    	recorder.stop();
+    	recorder.exportWAV(function(s) {
+            audio.src = window.URL.createObjectURL(s);
+    	});
+    }
+
+
+            </script>
+    	</body>
+    </html>
+    
+  
